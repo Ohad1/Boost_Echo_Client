@@ -79,18 +79,28 @@ bool ConnectionHandler::sendLine(std::string& line) {
  
 bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
     char ch;
+    char ackOpcode[2];
+    char messageOpcode[2];
+    getBytes(&ch, 1);
+    ackOpcode[ch];
+    getBytes(&ch, 1);
+    ackOpcode[ch];
+    getBytes(&ch, 1);
+    messageOpcode[ch];
+    getBytes(&ch, 1);
+    messageOpcode[ch];
     // Stop when we encounter the null character. 
     // Notice that the null character is not appended to the frame string.
-    try {
-		do{
-			getBytes(&ch, 1);
-            frame.append(1, ch);
-        }while (delimiter != ch);
-    } catch (std::exception& e) {
-        std::cerr << "recv failed (Error: " << e.what() << ')' << std::endl;
-        return false;
-    }
-    return true;
+//    try {
+//		do{
+//			getBytes(&ch, 1);
+//            frame.append(1, ch);
+//        }while (delimiter != ch);
+//    } catch (std::exception& e) {
+//        std::cerr << "recv failed (Error: " << e.what() << ')' << std::endl;
+//        return false;
+//    }
+//    return true;
 }
  
 bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
@@ -114,4 +124,17 @@ bool ConnectionHandler::isShouldTerminate() const {
 
 void ConnectionHandler::setShouldTerminate(bool shouldTerminate) {
     ConnectionHandler::shouldTerminate = shouldTerminate;
+}
+
+short bytesToShort(char* bytesArr)
+{
+    short result = (short)((bytesArr[0] & 0xff) << 8);
+    result += (short)(bytesArr[1] & 0xff);
+    return result;
+}
+
+void shortToBytes(short num, char* bytesArr)
+{
+    bytesArr[0] = ((num >> 8) & 0xFF);
+    bytesArr[1] = (num & 0xFF);
 }
