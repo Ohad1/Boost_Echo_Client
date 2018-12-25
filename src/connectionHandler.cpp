@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <boost/lexical_cast.hpp>
 #include <iostream>
 using namespace std;
 
@@ -253,16 +254,17 @@ string ConnectionHandler::encode(std::string msg) {
             line_after_encode =  buildFollow(msg);
         }
         if (part.compare("POST") == 0) {
-            //  buildCustomer(msg);
+            line_after_encode =  buildPost(msg);
         }
         if (part.compare("PM") == 0) {
-            //  buildCustomer(msg);
+            line_after_encode =  buildPM(msg);
         }
         if (part.compare("USERLIST") == 0) {
-            //  buildCustomer(msg);
+            line_after_encode =  buildUserList(msg);
         }
         if (part.compare("STAT") == 0) {
-            //  buildCustomer(msg);
+            line_after_encode =  buildSTAT(msg);
+
         }
         i++;
     }
@@ -276,7 +278,9 @@ std::string ConnectionHandler::buildLogin(std::string msg) {
     int i = 0;
     string username;
     string password;
-    std::string line_after_encode("2");
+    char* opcode;
+    shortToBytes(2,opcode);
+    std::string line_after_encode(opcode);
 
     while (getline(iss, part, ' ') && i <= 3) // the name of the action is in name_action
     {
@@ -299,7 +303,9 @@ std::string ConnectionHandler::buildRegister(std::string msg) {
     int i = 0;
     string username;
     string password;
-    std::string line_after_encode("1");
+    char* opcode;
+    shortToBytes(1,opcode);
+    std::string line_after_encode(opcode);
 
     while (getline(iss, part, ' ') && i <= 3) // the name of the action is in name_action
     {
@@ -317,8 +323,10 @@ std::string ConnectionHandler::buildRegister(std::string msg) {
 }
 
 std::string ConnectionHandler::buildLogout(std::string msg) {
-    std::string line_after_encode("3");
-    return line_after_encode;
+    char* opcode;
+    shortToBytes(3,opcode);
+    std::string line_after_encode(opcode);
+    return  line_after_encode;
 }
 
 std::string ConnectionHandler::buildFollow(std::string msg) {
@@ -328,7 +336,9 @@ std::string ConnectionHandler::buildFollow(std::string msg) {
     string type_follow;
     string num_users;
     string password;
-    std::string line_after_encode("4");
+    char* opcode;
+    shortToBytes(1,opcode);
+    std::string line_after_encode(opcode);
 
     while (getline(iss, part, ' ')) // the name of the action is in name_action
     {
@@ -336,10 +346,13 @@ std::string ConnectionHandler::buildFollow(std::string msg) {
             line_after_encode += part;
         }
         if (i == 2) { // num of followers
-            line_after_encode += part;
+            char* num;
+            short myShort = boost::lexical_cast<short>(part);
+            shortToBytes(myShort, num);
+            line_after_encode += num;
         }
 
-        else // user list names
+        if(i>=3)// user list names
         {
             line_after_encode += part;
             line_after_encode +='\0';
@@ -347,4 +360,82 @@ std::string ConnectionHandler::buildFollow(std::string msg) {
         i++;
     }
     return line_after_encode;}
+
+std::string ConnectionHandler::buildPost(std::string msg) {
+    istringstream iss(msg);
+    string part;
+    int i = 0;
+    string content;
+    char* opcode;
+    shortToBytes(5,opcode);
+    std::string line_after_encode(opcode);
+
+    while (getline(iss, part, ' ')) // the name of the action is in name_action
+    {
+        if (i >=1) {
+            line_after_encode += part;
+            line_after_encode += " ";
+        }
+        i++;
+    }
+    int size=line_after_encode.size();
+    string b = line_after_encode.substr(0,size-1);
+    b+='\0';
+    return b;
+}
+
+std::string ConnectionHandler::buildPM(std::string msg) {
+    istringstream iss(msg);
+    string part;
+    int i = 0;
+    char* opcode;
+    shortToBytes(6,opcode);
+    std::string line_after_encode(opcode);
+
+    while (getline(iss, part, ' ')) // the name of the action is in name_action
+    {
+        if (i==1) { //username
+            line_after_encode += part;
+            line_after_encode += '\0';
+        }
+        if(i>=2){
+            line_after_encode += part;
+            line_after_encode += " ";
+        }
+        i++;
+    }
+    int size=line_after_encode.size();
+    string b = line_after_encode.substr(0,size-1);
+    b+='\0';
+    return b;
+}
+
+std::string ConnectionHandler::buildUserList(std::string msg) {
+    istringstream iss(msg);
+    char* opcode;
+    shortToBytes(7,opcode);
+    std::string line_after_encode(opcode);
+    return  line_after_encode;
+}
+
+std::string ConnectionHandler::buildSTAT(std::string msg) {
+    istringstream iss(msg);
+    string part;
+    int i = 0;
+    string username;
+    char* opcode;
+    shortToBytes(8,opcode);
+    std::string line_after_encode(opcode);
+
+    while (getline(iss, part, ' ') && i <2) // the name of the action is in name_action
+    {
+        if (i == 1) {
+            username = part + '\0';
+            line_after_encode += username;
+        }
+        i++;
+    }
+    return line_after_encode;
+
+}
 
