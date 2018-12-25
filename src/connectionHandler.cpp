@@ -195,7 +195,6 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
  
 bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
 	string line_after_encode=encode(frame);
-
     bool result=sendBytes(frame.c_str(),frame.length());
 	if(!result) return false;
 	return sendBytes(&delimiter,1);
