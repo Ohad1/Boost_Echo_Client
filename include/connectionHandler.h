@@ -63,6 +63,10 @@ public:
     std::string buildLogout(std::string basic_string);
 
     std::string buildFollow(std::string basic_string);
+
+    std::string buildPost(std::string basic_string);
+
+    std::string buildPM(std::string basic_string);
 }; //class ConnectionHandler
 
 #endif

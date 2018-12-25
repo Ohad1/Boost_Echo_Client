@@ -144,10 +144,10 @@ string ConnectionHandler::encode(std::string msg) {
             line_after_encode =  buildFollow(msg);
         }
         if (part.compare("POST") == 0) {
-            //  buildCustomer(msg);
+            line_after_encode =  buildPost(msg);
         }
         if (part.compare("PM") == 0) {
-            //  buildCustomer(msg);
+            line_after_encode =  buildPM(msg);
         }
         if (part.compare("USERLIST") == 0) {
             //  buildCustomer(msg);
@@ -238,4 +238,12 @@ std::string ConnectionHandler::buildFollow(std::string msg) {
         i++;
     }
     return line_after_encode;}
+
+std::string ConnectionHandler::buildPost(std::string basic_string) {
+    return std::__cxx11::string();
+}
+
+std::string ConnectionHandler::buildPM(std::string basic_string) {
+    return std::__cxx11::string();
+}
 
