@@ -1,5 +1,5 @@
 #include <connectionHandler.h>
-#include <hwloc/inlines.h>
+#include <hwloc.h>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -26,13 +26,15 @@ bool ConnectionHandler::connect() {
     std::cout << "Starting connect to " 
         << host_ << ":" << port_ << std::endl;
     try {
-		tcp::endpoint endpoint(boost::asio::ip::address::from_string(host_), port_); // the server endpoint
+        std::cout << "try " << std::endl;
+        tcp::endpoint endpoint(boost::asio::ip::address::from_string(host_), port_); // the server endpoint
+        std::cout << "after endpoint " << std::endl;
 		boost::system::error_code error;
 		socket_.connect(endpoint, error);
+        std::cout << "after connect " << std::endl;
+        std::cout << error << std::endl;
 		if (error)
 			throw boost::system::system_error(error);
-
-
 
     }
     catch (std::exception& e) {
@@ -124,6 +126,8 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
             else if (serverToClientOpcode==10) {
                 if (messageOpcode==3) {
                     frame.append("ACK " + std::to_string(messageOpcode));
+                    shouldTerminate = true;
+                    close();
                     return true;
                 }
                 else if (messageOpcode==4 | messageOpcode==7) {
