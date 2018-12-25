@@ -27,7 +27,7 @@ public:
     bool connect();
 
     //encode- gets string and parse to byte
-    char[] encode(std::string msg);
+    char* encode(std::string msg); //todo check *char
  
     // Read a fixed number of bytes from the server - blocking.
     // Returns false in case the connection is closed before bytesToRead bytes can be read.

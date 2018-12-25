@@ -1,21 +1,24 @@
 #include <iostream>
 #include <boost/thread.hpp>
 #include "../include/connectionHandler.h"
+#include <sstream>
+#include <fstream>
+#include <string>
+using namespace std;
 
 class ReadFromKeyboard {
 private:
     ConnectionHandler *_connectionHandler;
-    boost::mutex *_mutex;
 
 public:
-    ReadFromKeyboard(ConnectionHandler *connectionHandler, boost::mutex *mutex) : _connectionHandler(connectionHandler), _mutex(mutex) {
+    ReadFromKeyboard(ConnectionHandler *connectionHandler) : _connectionHandler(connectionHandler) {
     }
 
     void run() {
         while (!_connectionHandler->isShouldTerminate()){
-
-            boost::mutex::scoped_lock lock(*_mutex);
-
+            std::string mystr;
+            getline (cin,mystr);
+            _connectionHandler->sendLine(mystr); //encode and send
         }
     }
 };
