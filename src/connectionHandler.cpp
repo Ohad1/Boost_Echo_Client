@@ -79,16 +79,100 @@ bool ConnectionHandler::sendLine(std::string& line) {
  
 bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
     char ch;
-    char ackOpcode[2];
-    char messageOpcode[2];
-    getBytes(&ch, 1);
-    ackOpcode[ch];
-    getBytes(&ch, 1);
-    ackOpcode[ch];
-    getBytes(&ch, 1);
-    messageOpcode[ch];
-    getBytes(&ch, 1);
-    messageOpcode[ch];
+    char serverToClientOpcodeArray[2];
+    char messageOpcodeArray[2];
+    short serverToClientOpcode;
+    short messageOpcode;
+    try {
+        getBytes(&ch, 1);
+        serverToClientOpcodeArray[0] = ch;
+        getBytes(&ch, 1);
+        serverToClientOpcodeArray[1] = ch;
+        serverToClientOpcode = bytesToShort(serverToClientOpcodeArray);
+        if (serverToClientOpcode==9) {
+            getBytes(&ch, 1);
+            frame.append(1, ch);
+            frame.append(" ");
+            do{
+                getBytes(&ch, 1);
+                frame.append(1, ch);
+            }while ('\0' != ch);
+            frame.append(" ");
+            do{
+                getBytes(&ch, 1);
+                frame.append(1, ch);
+            }while ('\0' != ch);
+            return true;
+        }
+        else {
+            getBytes(&ch, 1);
+            messageOpcodeArray[0] = ch;
+            getBytes(&ch, 1);
+            messageOpcodeArray[0] = ch;
+            messageOpcode = bytesToShort(messageOpcodeArray);
+            if (serverToClientOpcode==11) {
+                frame.append("ERROR " + std::to_string(messageOpcode));
+                return true;
+            }
+            else if (serverToClientOpcode==10) {
+                if (messageOpcode==3) {
+                    frame.append("ACK " + std::to_string(messageOpcode));
+                    return true;
+                }
+                else if (messageOpcode==4 | messageOpcode==7) {
+                    char numOfUsersArray[2];
+                    getBytes(&ch, 1);
+                    numOfUsersArray[0] = ch;
+                    getBytes(&ch, 1);
+                    numOfUsersArray[0] = ch;
+                    short numOfUsers = bytesToShort(numOfUsersArray);
+                    frame.append(std::to_string(10) + " " + std::to_string(messageOpcode) + " " + std::to_string(numOfUsers));
+                    //string username;
+                    for (int i = 0; i < numOfUsers; i++) {
+                        do{
+                            getBytes(&ch, 1);
+                            frame.append(1, ch);
+                        }while ('\0' != ch);
+                        if (i!=numOfUsers-1) {
+                            frame.append(" ");
+                        }
+                    }
+                }
+                else if (messageOpcode==8) {
+                    char numOfPostsArray[2];
+                    getBytes(&ch, 1);
+                    numOfPostsArray[0] = ch;
+                    getBytes(&ch, 1);
+                    numOfPostsArray[0] = ch;
+                    short numOfPosts = bytesToShort(numOfPostsArray);
+                    char numOfFollowersArray[2];
+                    getBytes(&ch, 1);
+                    numOfFollowersArray[0] = ch;
+                    getBytes(&ch, 1);
+                    numOfFollowersArray[0] = ch;
+                    short numOfFollowers = bytesToShort(numOfFollowersArray);
+                    char numOfFollowingsArray[2];
+                    getBytes(&ch, 1);
+                    numOfFollowingsArray[0] = ch;
+                    getBytes(&ch, 1);
+                    numOfFollowingsArray[0] = ch;
+                    short numOfFollowing = bytesToShort(numOfFollowingsArray);
+                    frame.append(std::to_string(10) + " " +
+                    std::to_string(numOfPosts) + " " +
+                    std::to_string(numOfFollowers) + " " +
+                    std::to_string(numOfFollowing));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    catch (std::exception& e) {
+        std::cerr << "recv failed (Error: " << e.what() << ')' << std::endl;
+        return false;
+    }
+
+
     // Stop when we encounter the null character. 
     // Notice that the null character is not appended to the frame string.
 //    try {
@@ -126,15 +210,16 @@ void ConnectionHandler::setShouldTerminate(bool shouldTerminate) {
     ConnectionHandler::shouldTerminate = shouldTerminate;
 }
 
-short bytesToShort(char* bytesArr)
+short ConnectionHandler::bytesToShort(char* bytesArr)
 {
     short result = (short)((bytesArr[0] & 0xff) << 8);
     result += (short)(bytesArr[1] & 0xff);
     return result;
 }
 
-void shortToBytes(short num, char* bytesArr)
+void ConnectionHandler::shortToBytes(short num, char* bytesArr)
 {
     bytesArr[0] = ((num >> 8) & 0xFF);
     bytesArr[1] = (num & 0xFF);
 }
+
