@@ -27,7 +27,7 @@ public:
     bool connect();
 
     //encode- gets string and parse to byte
-    char* encode(std::string msg); //todo check *char
+    std::string encode(std::string msg); //todo check *char
  
     // Read a fixed number of bytes from the server - blocking.
     // Returns false in case the connection is closed before bytesToRead bytes can be read.
@@ -56,10 +56,18 @@ public:
     // Close down the connection properly.
     void close();
 
+    std::string buildLogin(std::string basic_string);
+
+    std::string buildRegister(std::string basic_string);
+
+    std::string buildLogout(std::string basic_string);
+
+    std::string buildFollow(std::string basic_string);
+
     short bytesToShort(char* bytesArr);
 
     void shortToBytes(short num, char* bytesArr);
- 
+
 }; //class ConnectionHandler
- 
+
 #endif

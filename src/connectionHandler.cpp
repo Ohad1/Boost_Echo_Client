@@ -1,5 +1,11 @@
 #include <connectionHandler.h>
- 
+#include <hwloc/inlines.h>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <iostream>
+using namespace std;
+
 using boost::asio::ip::tcp;
 
 using std::cin;
@@ -173,7 +179,7 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
     }
 
 
-    // Stop when we encounter the null character. 
+    // Stop when we encounter the null character.
     // Notice that the null character is not appended to the frame string.
 //    try {
 //		do{
@@ -188,7 +194,9 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
 }
  
 bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
-	bool result=sendBytes(frame.c_str(),frame.length());
+	string line_after_encode=encode(frame);
+
+    bool result=sendBytes(frame.c_str(),frame.length());
 	if(!result) return false;
 	return sendBytes(&delimiter,1);
 }
@@ -222,4 +230,122 @@ void ConnectionHandler::shortToBytes(short num, char* bytesArr)
     bytesArr[0] = ((num >> 8) & 0xFF);
     bytesArr[1] = (num & 0xFF);
 }
+
+
+string ConnectionHandler::encode(std::string msg) {
+    string line_after_encode;
+    istringstream iss(msg);
+    string part;
+    int i = 0;
+    while (getline(iss, part, ' ') && i == 0) // the name of the action is in name_action
+    {
+        if (part.compare("REGISTER") == 0) {
+            line_after_encode =  buildRegister(msg);
+        }
+
+        if (part.compare("LOGIN") == 0) {
+            line_after_encode =  buildLogin(msg);
+        }
+
+        if (part.compare("LOGOUT") == 0) {
+            line_after_encode =  buildLogout(msg);
+        }
+        if (part.compare("FOLLOW") == 0) {
+            line_after_encode =  buildFollow(msg);
+        }
+        if (part.compare("POST") == 0) {
+            //  buildCustomer(msg);
+        }
+        if (part.compare("PM") == 0) {
+            //  buildCustomer(msg);
+        }
+        if (part.compare("USERLIST") == 0) {
+            //  buildCustomer(msg);
+        }
+        if (part.compare("STAT") == 0) {
+            //  buildCustomer(msg);
+        }
+        i++;
+    }
+    return line_after_encode;
+
+}
+
+std::string ConnectionHandler::buildLogin(std::string msg) {
+    istringstream iss(msg);
+    string part;
+    int i = 0;
+    string username;
+    string password;
+    std::string line_after_encode("2");
+
+    while (getline(iss, part, ' ') && i <= 3) // the name of the action is in name_action
+    {
+        if (i == 1) {
+            username = part + '\0';
+            line_after_encode += username;
+        }
+        if (i == 2) {
+            password = part + '\0';
+            line_after_encode += password;
+        }
+        i++;
+    }
+    return line_after_encode;
+}
+
+std::string ConnectionHandler::buildRegister(std::string msg) {
+    istringstream iss(msg);
+    string part;
+    int i = 0;
+    string username;
+    string password;
+    std::string line_after_encode("1");
+
+    while (getline(iss, part, ' ') && i <= 3) // the name of the action is in name_action
+    {
+        if (i == 1) {
+            username = part + '\0';
+            line_after_encode += username;
+        }
+        if (i == 2) {
+            password = part + "\0";
+            line_after_encode += password;
+        }
+        i++;
+    }
+    return line_after_encode;
+}
+
+std::string ConnectionHandler::buildLogout(std::string msg) {
+    std::string line_after_encode("3");
+    return line_after_encode;
+}
+
+std::string ConnectionHandler::buildFollow(std::string msg) {
+    istringstream iss(msg);
+    string part;
+    int i = 0;
+    string type_follow;
+    string num_users;
+    string password;
+    std::string line_after_encode("4");
+
+    while (getline(iss, part, ' ')) // the name of the action is in name_action
+    {
+        if (i == 1) { //type_follow
+            line_after_encode += part;
+        }
+        if (i == 2) { // num of followers
+            line_after_encode += part;
+        }
+
+        else // user list names
+        {
+            line_after_encode += part;
+            line_after_encode +='\0';
+        }
+        i++;
+    }
+    return line_after_encode;}
 
