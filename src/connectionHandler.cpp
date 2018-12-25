@@ -315,7 +315,7 @@ std::string ConnectionHandler::buildRegister(std::string msg) {
     char* opcode;
     short  j=1;
     shortToBytes(j,opcode);
-    
+
     std::string line_after_encode(opcode);
     std::cout << "line_after_encode number "<< std::flush;
     while (getline(iss, part, ' ') && i <= 3) // the name of the action is in name_action
