@@ -72,6 +72,10 @@ public:
     std::string buildPost(std::string basic_string);
 
     std::string buildPM(std::string basic_string);
+
+    std::string buildUserList(std::string basic_string);
+
+    std::string buildSTAT(std::string basic_string);
 }; //class ConnectionHandler
 
 #endif
