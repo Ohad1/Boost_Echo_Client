@@ -64,6 +64,11 @@ public:
 
     std::string buildFollow(std::string basic_string);
 
+    short bytesToShort(char* bytesArr);
+
+    void shortToBytes(short num, char* bytesArr);
+
+
     std::string buildPost(std::string basic_string);
 
     std::string buildPM(std::string basic_string);
