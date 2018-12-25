@@ -8,7 +8,8 @@ using std::cerr;
 using std::endl;
 using std::string;
  
-ConnectionHandler::ConnectionHandler(string host, short port): host_(host), port_(port), io_service_(), socket_(io_service_){}
+ConnectionHandler::ConnectionHandler(string host, short port): host_(host), port_(port), io_service_(),
+socket_(io_service_), shouldTerminate(false){}
     
 ConnectionHandler::~ConnectionHandler() {
     close();
@@ -23,6 +24,9 @@ bool ConnectionHandler::connect() {
 		socket_.connect(endpoint, error);
 		if (error)
 			throw boost::system::system_error(error);
+
+
+
     }
     catch (std::exception& e) {
         std::cerr << "Connection failed (Error: " << e.what() << ')' << std::endl;
@@ -100,4 +104,12 @@ void ConnectionHandler::close() {
     } catch (...) {
         std::cout << "closing failed: connection already closed" << std::endl;
     }
+}
+
+bool ConnectionHandler::isShouldTerminate() const {
+    return shouldTerminate;
+}
+
+void ConnectionHandler::setShouldTerminate(bool shouldTerminate) {
+    ConnectionHandler::shouldTerminate = shouldTerminate;
 }

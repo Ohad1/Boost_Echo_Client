@@ -17,4 +17,4 @@ add_executable(Boost_Echo_Client
         include/connectionHandler.h
         src/connectionHandler.cpp
         src/echoClient.cpp
-        makefile)
+        makefile src/ReadFromSocket.cpp src/ReadFromKeyboard.cpp)

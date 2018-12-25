@@ -12,14 +12,22 @@ private:
 	const std::string host_;
 	const short port_;
 	boost::asio::io_service io_service_;   // Provides core I/O functionality
-	tcp::socket socket_; 
- 
+	tcp::socket socket_;
+    bool shouldTerminate;
+public:
+    bool isShouldTerminate() const;
+
+    void setShouldTerminate(bool shouldTerminate);
+
 public:
     ConnectionHandler(std::string host, short port);
     virtual ~ConnectionHandler();
  
     // Connect to the remote machine
     bool connect();
+
+    //encode- gets string and parse to byte
+    char[] encode(std::string msg);
  
     // Read a fixed number of bytes from the server - blocking.
     // Returns false in case the connection is closed before bytesToRead bytes can be read.
