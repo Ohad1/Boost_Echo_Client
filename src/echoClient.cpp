@@ -23,9 +23,11 @@ int main (int argc, char *argv[]) {
     //after we initialize the connection handler we will start the 2 threads
     ReadFromKeyboard task1(&connectionHandler);
     ReadFromSocket task2(&connectionHandler);
-
+    std::cout << "run  t1" << std::endl;
     std::thread th1(&ReadFromKeyboard::run, &task1);
+    std::cout << "run  t2" << std::endl;
     std::thread th2(&ReadFromSocket::run, &task2);
+    std::cout << "after run" << std::endl;
     th1.join();
     th2.join();
 

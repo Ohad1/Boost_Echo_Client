@@ -16,6 +16,7 @@ public:
 
     void run() {
         while (!_connectionHandler->isShouldTerminate()){
+            std::cout << "run  ReadFromSocket" << std::endl;
             string answer="";
             if(_connectionHandler->getLine(answer))
                 printf("%s\n",answer.c_str()); // get the line from the socket after decode and print

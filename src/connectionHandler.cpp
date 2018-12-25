@@ -83,6 +83,7 @@ bool ConnectionHandler::getLine(std::string& line) {
 }
 // good
 bool ConnectionHandler::sendLine(std::string& line) {
+    std::cout << "line is: " + line << std::flush;
     return sendFrameAscii(line, '\n');
 }
  
@@ -199,8 +200,10 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
 }
  
 bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
+    std::cout << "inside sendFrameAscii" << std::flush;
 	string line_after_encode=encode(frame);
-    bool result=sendBytes(frame.c_str(),frame.length());
+    std::cout << "line_after_encode: " + line_after_encode << std::flush;
+    bool result=sendBytes(line_after_encode.c_str(),frame.length());
 	if(!result) return false;
 	return sendBytes(&delimiter,1);
 }
@@ -237,6 +240,7 @@ void ConnectionHandler::shortToBytes(short num, char* bytesArr)
 
 
 string ConnectionHandler::encode(std::string msg) {
+    std::cout << "inside encode " << std::endl;
     string line_after_encode;
     istringstream iss(msg);
     string part;
@@ -244,6 +248,7 @@ string ConnectionHandler::encode(std::string msg) {
     while (getline(iss, part, ' ') && i == 0) // the name of the action is in name_action
     {
         if (part.compare("REGISTER") == 0) {
+            std::cout << "inside REGISTER " << std::flush;
             line_after_encode =  buildRegister(msg);
         }
 
@@ -308,9 +313,11 @@ std::string ConnectionHandler::buildRegister(std::string msg) {
     string username;
     string password;
     char* opcode;
-    shortToBytes(1,opcode);
+    short  j=1;
+    shortToBytes(j,opcode);
+    
     std::string line_after_encode(opcode);
-
+    std::cout << "line_after_encode number "<< std::flush;
     while (getline(iss, part, ' ') && i <= 3) // the name of the action is in name_action
     {
         if (i == 1) {
