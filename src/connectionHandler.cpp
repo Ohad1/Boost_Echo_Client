@@ -48,7 +48,6 @@ bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
     try {
         while (!error && bytesToRead > tmp ) {
 			tmp += socket_.read_some(boost::asio::buffer(bytes+tmp, bytesToRead-tmp), error);
-            std::cout << "socket read "<< std::flush;
         }
 		if(error)
 			throw boost::system::system_error(error);
@@ -78,17 +77,14 @@ bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
 
 // good
 bool ConnectionHandler::getLine(std::string& line) {
-    std::cout << "inside getline " << std::flush;
     return getFrameAscii(line, '\n');
 }
 // good
 bool ConnectionHandler::sendLine(std::string& line) {
-    std::cout << "line is: " + line << std::flush;
     return sendFrameAscii(line, '\n');
 }
  
 bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
-    std::cout << "inside getFrameAscii " << std::flush;
     char ch;
     char serverToClientOpcodeArray[2];
     char messageOpcodeArray[2];
@@ -119,7 +115,7 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
             getBytes(&ch, 1);
             messageOpcodeArray[0] = ch;
             getBytes(&ch, 1);
-            messageOpcodeArray[0] = ch;
+            messageOpcodeArray[1] = ch;
             messageOpcode = bytesToShort(messageOpcodeArray);
             if (serverToClientOpcode==11) {
                 frame.append("ERROR " + std::to_string(messageOpcode));
@@ -205,7 +201,6 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
 }
  
 bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
-    std::cout << "inside sendFrameAscii" << std::flush;
 	vector<char> line_after_encode = encode(frame);
     int size = line_after_encode.size();
     char output[size];
@@ -250,7 +245,6 @@ void ConnectionHandler::shortToBytes(short num, char* bytesArr)
 
 
 vector<char> ConnectionHandler::encode(std::string msg) {
-    std::cout << "inside encode " << std::endl;
     vector<char> line_after_encode;
     istringstream iss(msg);
     string part;
@@ -258,7 +252,6 @@ vector<char> ConnectionHandler::encode(std::string msg) {
     while (getline(iss, part, ' ') && i == 0) // the name of the action is in name_action
     {
         if (part.compare("REGISTER") == 0) {
-            std::cout << "inside REGISTER " << std::flush;
             line_after_encode =  buildRegister(msg);
         }
 
