@@ -27,12 +27,9 @@ bool ConnectionHandler::connect() {
     std::cout << "Starting connect to " 
         << host_ << ":" << port_ << std::endl;
     try {
-        std::cout << "try " << std::endl;
         tcp::endpoint endpoint(boost::asio::ip::address::from_string(host_), port_); // the server endpoint
-        std::cout << "after endpoint " << std::endl;
 		boost::system::error_code error;
 		socket_.connect(endpoint, error);
-        std::cout << "after connect " << std::endl;
         std::cout << error << std::endl;
 		if (error)
 			throw boost::system::system_error(error);
@@ -50,7 +47,8 @@ bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
 	boost::system::error_code error;
     try {
         while (!error && bytesToRead > tmp ) {
-			tmp += socket_.read_some(boost::asio::buffer(bytes+tmp, bytesToRead-tmp), error);			
+			tmp += socket_.read_some(boost::asio::buffer(bytes+tmp, bytesToRead-tmp), error);
+            std::cout << "socket read "<< std::flush;
         }
 		if(error)
 			throw boost::system::system_error(error);
@@ -80,6 +78,7 @@ bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
 
 // good
 bool ConnectionHandler::getLine(std::string& line) {
+    std::cout << "inside getline " << std::flush;
     return getFrameAscii(line, '\n');
 }
 // good
@@ -89,6 +88,7 @@ bool ConnectionHandler::sendLine(std::string& line) {
 }
  
 bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
+    std::cout << "inside getFrameAscii " << std::flush;
     char ch;
     char serverToClientOpcodeArray[2];
     char messageOpcodeArray[2];

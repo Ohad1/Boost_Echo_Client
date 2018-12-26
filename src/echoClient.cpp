@@ -26,6 +26,7 @@ int main (int argc, char *argv[]) {
     std::cout << "run  t1" << std::endl;
     std::thread th1(&ReadFromKeyboard::run, &task1);
     std::cout << "run  t2" << std::endl;
+    sleep(10);
     std::thread th2(&ReadFromSocket::run, &task2);
     std::cout << "after run" << std::endl;
     th1.join();
