@@ -56,26 +56,26 @@ public:
     // Close down the connection properly.
     void close();
 
-    std::string buildLogin(std::string basic_string);
+    std::vector<char> buildLogin(std::string basic_string);
 
     std::vector<char> buildRegister(std::string basic_string);
 
-    std::string buildLogout(std::string basic_string);
+    std::vector<char> buildLogout(std::string basic_string);
 
-    std::string buildFollow(std::string basic_string);
+    std::vector<char> buildFollow(std::string basic_string);
 
     short bytesToShort(char* bytesArr);
 
     void shortToBytes(short num, char* bytesArr);
 
 
-    std::string buildPost(std::string basic_string);
+    std::vector<char> buildPost(std::string basic_string);
 
-    std::string buildPM(std::string basic_string);
+    std::vector<char> buildPM(std::string basic_string);
 
-    std::string buildUserList(std::string basic_string);
+    std::vector<char> buildUserList(std::string basic_string);
 
-    std::string buildSTAT(std::string basic_string);
+    std::vector<char> buildSTAT(std::string basic_string);
 }; //class ConnectionHandler
 
 #endif
