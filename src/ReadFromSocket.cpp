@@ -19,7 +19,7 @@ public:
             std::cout << "run  ReadFromSocket" << std::endl;
             string answer="";
             if(_connectionHandler->getLine(answer)) {
-                printf("in if");
+                printf ("%s \n", "in if");
                 printf("%s\n",answer.c_str()); // get the line from the socket after decode and print
             }
 //            std::string answer;
