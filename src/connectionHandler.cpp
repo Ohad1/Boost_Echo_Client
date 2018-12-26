@@ -289,7 +289,7 @@ std::vector<char> ConnectionHandler::buildLogin(std::string msg) {
     string part;
     int i = 0;
     char opcode[2];
-    short  j=1;
+    short  j=2;
     shortToBytes(j,opcode);
     std::vector<char> charVector;
     charVector.push_back(opcode[0]);
