@@ -14,6 +14,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::string;
+using std::to_string;
  
 ConnectionHandler::ConnectionHandler(string host, short port): host_(host), port_(port), io_service_(),
 socket_(io_service_), shouldTerminate(false){}
@@ -201,9 +202,13 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
  
 bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
     std::cout << "inside sendFrameAscii" << std::flush;
-	string line_after_encode=encode(frame);
-    std::cout << "line_after_encode: " + line_after_encode << std::flush;
-    bool result=sendBytes(line_after_encode.c_str(),frame.length());
+	vector<char> line_after_encode = encode(frame);
+    int size = line_after_encode.size();
+    char output[size];
+    for (int k = 0; k < size; k++) {
+        output[k] = line_after_encode[k];
+    }
+    bool result=sendBytes(output,size);
 	if(!result) return false;
 	return sendBytes(&delimiter,1);
 }
@@ -239,9 +244,9 @@ void ConnectionHandler::shortToBytes(short num, char* bytesArr)
 }
 
 
-string ConnectionHandler::encode(std::string msg) {
+vector<char> ConnectionHandler::encode(std::string msg) {
     std::cout << "inside encode " << std::endl;
-    string line_after_encode;
+    vector<char> line_after_encode;
     istringstream iss(msg);
     string part;
     int i = 0;
@@ -252,29 +257,29 @@ string ConnectionHandler::encode(std::string msg) {
             line_after_encode =  buildRegister(msg);
         }
 
-        if (part.compare("LOGIN") == 0) {
-            line_after_encode =  buildLogin(msg);
-        }
-
-        if (part.compare("LOGOUT") == 0) {
-            line_after_encode =  buildLogout(msg);
-        }
-        if (part.compare("FOLLOW") == 0) {
-            line_after_encode =  buildFollow(msg);
-        }
-        if (part.compare("POST") == 0) {
-            line_after_encode =  buildPost(msg);
-        }
-        if (part.compare("PM") == 0) {
-            line_after_encode =  buildPM(msg);
-        }
-        if (part.compare("USERLIST") == 0) {
-            line_after_encode =  buildUserList(msg);
-        }
-        if (part.compare("STAT") == 0) {
-            line_after_encode =  buildSTAT(msg);
-
-        }
+//        if (part.compare("LOGIN") == 0) {
+//            line_after_encode =  buildLogin(msg);
+//        }
+//
+//        if (part.compare("LOGOUT") == 0) {
+//            line_after_encode =  buildLogout(msg);
+//        }
+//        if (part.compare("FOLLOW") == 0) {
+//            line_after_encode =  buildFollow(msg);
+//        }
+//        if (part.compare("POST") == 0) {
+//            line_after_encode =  buildPost(msg);
+//        }
+//        if (part.compare("PM") == 0) {
+//            line_after_encode =  buildPM(msg);
+//        }
+//        if (part.compare("USERLIST") == 0) {
+//            line_after_encode =  buildUserList(msg);
+//        }
+//        if (part.compare("STAT") == 0) {
+//            line_after_encode =  buildSTAT(msg);
+//
+//        }
         i++;
     }
     return line_after_encode;
@@ -306,31 +311,29 @@ std::string ConnectionHandler::buildLogin(std::string msg) {
     return line_after_encode;
 }
 
-std::string ConnectionHandler::buildRegister(std::string msg) {
+std::vector<char> ConnectionHandler::buildRegister(std::string msg) {
     istringstream iss(msg);
     string part;
     int i = 0;
-    string username;
-    string password;
-    char* opcode;
+//    string username;
+//    string password;
+    char opcode[2];
     short  j=1;
     shortToBytes(j,opcode);
-
-    std::string line_after_encode(opcode);
-    std::cout << "line_after_encode number "<< std::flush;
+    std::vector<char> charVector;
+    charVector.push_back(opcode[0]);
+    charVector.push_back(opcode[1]);
     while (getline(iss, part, ' ') && i <= 3) // the name of the action is in name_action
     {
-        if (i == 1) {
-            username = part + '\0';
-            line_after_encode += username;
-        }
-        if (i == 2) {
-            password = part + "\0";
-            line_after_encode += password;
+        if (i == 1 | i == 2) {
+            for (int k = 0; k < part.length(); k++) {
+                charVector.push_back(part[k]);
+            }
+            charVector.push_back('\0');
         }
         i++;
     }
-    return line_after_encode;
+    return charVector;
 }
 
 std::string ConnectionHandler::buildLogout(std::string msg) {

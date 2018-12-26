@@ -27,7 +27,7 @@ public:
     bool connect();
 
     //encode- gets string and parse to byte
-    std::string encode(std::string msg); //todo check *char
+    std::vector<char> encode(std::string msg); //todo check *char
  
     // Read a fixed number of bytes from the server - blocking.
     // Returns false in case the connection is closed before bytesToRead bytes can be read.
@@ -58,7 +58,7 @@ public:
 
     std::string buildLogin(std::string basic_string);
 
-    std::string buildRegister(std::string basic_string);
+    std::vector<char> buildRegister(std::string basic_string);
 
     std::string buildLogout(std::string basic_string);
 
