@@ -139,7 +139,7 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
                     getBytes(&ch, 1);
                     numOfUsersArray[0] = ch;
                     short numOfUsers = bytesToShort(numOfUsersArray);
-                    frame.append(std::to_string(10) + " " + std::to_string(messageOpcode) + " " + std::to_string(numOfUsers));
+                    frame.append("ACK " + std::to_string(messageOpcode) + " " + std::to_string(numOfUsers));
                     //string username;
                     for (int i = 0; i < numOfUsers; i++) {
                         do{
@@ -176,6 +176,10 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
                     std::to_string(numOfFollowing));
                     return true;
                 }
+                else {
+                    frame.append("ACK " + std::to_string(messageOpcode));
+                    return true;
+                }
             }
         }
         return false;
@@ -208,9 +212,10 @@ bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter)
     for (int k = 0; k < size; k++) {
         output[k] = line_after_encode[k];
     }
-    bool result=sendBytes(output,size);
-	if(!result) return false;
-	return sendBytes(&delimiter,1);
+//    bool result=sendBytes(output,size);
+//	if(!result) return false;
+//	return sendBytes(&delimiter,1);
+    return sendBytes(output,size);
 }
  
 // Close down the connection properly.
