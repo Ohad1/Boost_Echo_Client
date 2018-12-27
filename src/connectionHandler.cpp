@@ -97,18 +97,29 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
         serverToClientOpcodeArray[1] = ch;
         serverToClientOpcode = bytesToShort(serverToClientOpcodeArray);
         if (serverToClientOpcode==9) {
+            frame.append("NOTIFICATION ");
             getBytes(&ch, 1);
-            frame.append(1, ch);
-            frame.append(" ");
-            do{
+            if (ch=='\0') {
+                frame.append("Public ");
+            }
+            else {
+                frame.append("PM ");
+            }
+            while (1) {
                 getBytes(&ch, 1);
+                if (ch=='\0') {
+                    break;
+                }
                 frame.append(1, ch);
-            }while ('\0' != ch);
+            }
             frame.append(" ");
-            do{
+            while (1) {
                 getBytes(&ch, 1);
+                if (ch=='\0') {
+                    break;
+                }
                 frame.append(1, ch);
-            }while ('\0' != ch);
+            }
             return true;
         }
         else {
@@ -444,7 +455,8 @@ std::vector<char>  ConnectionHandler::buildPM(std::string msg) {
 
 std::vector<char> ConnectionHandler::buildUserList(std::string msg) {
     char opcode[2];
-    shortToBytes(7,opcode);
+    short j = 8;
+    shortToBytes(j,opcode);
     std::vector<char> output;
     output.push_back(opcode[0]);
     output.push_back(opcode[1]);
