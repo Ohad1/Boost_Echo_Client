@@ -133,38 +133,42 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
                     getBytes(&ch, 1);
                     numOfUsersArray[0] = ch;
                     getBytes(&ch, 1);
-                    numOfUsersArray[0] = ch;
+                    numOfUsersArray[1] = ch;
                     short numOfUsers = bytesToShort(numOfUsersArray);
-                    frame.append("ACK " + std::to_string(messageOpcode) + " " + std::to_string(numOfUsers));
+                    frame.append("ACK " + std::to_string(messageOpcode) + " " + std::to_string(numOfUsers) + " ");
                     //string username;
                     for (int i = 0; i < numOfUsers; i++) {
-                        do{
+                        while (1) {
                             getBytes(&ch, 1);
+                            if (ch=='\0') {
+                                break;
+                            }
                             frame.append(1, ch);
-                        }while ('\0' != ch);
+                        }
                         if (i!=numOfUsers-1) {
                             frame.append(" ");
                         }
                     }
+                    return true;
                 }
                 else if (messageOpcode==8) {
                     char numOfPostsArray[2];
                     getBytes(&ch, 1);
                     numOfPostsArray[0] = ch;
                     getBytes(&ch, 1);
-                    numOfPostsArray[0] = ch;
+                    numOfPostsArray[1] = ch;
                     short numOfPosts = bytesToShort(numOfPostsArray);
                     char numOfFollowersArray[2];
                     getBytes(&ch, 1);
                     numOfFollowersArray[0] = ch;
                     getBytes(&ch, 1);
-                    numOfFollowersArray[0] = ch;
+                    numOfFollowersArray[1] = ch;
                     short numOfFollowers = bytesToShort(numOfFollowersArray);
                     char numOfFollowingsArray[2];
                     getBytes(&ch, 1);
                     numOfFollowingsArray[0] = ch;
                     getBytes(&ch, 1);
-                    numOfFollowingsArray[0] = ch;
+                    numOfFollowingsArray[1] = ch;
                     short numOfFollowing = bytesToShort(numOfFollowingsArray);
                     frame.append(std::to_string(10) + " " +
                     std::to_string(numOfPosts) + " " +
@@ -351,7 +355,12 @@ std::vector<char> ConnectionHandler::buildFollow(std::string msg) {
     while (getline(iss, part, ' ')) // the name of the action is in name_action
     {
         if (i == 1) { //type_follow
-            output.push_back(part[0]);
+            if (part == "0") {
+                output.push_back('\0');
+            }
+            else {
+                output.push_back('\1');
+            }
         }
         if (i == 2) { // num of followers
             char num[2];
