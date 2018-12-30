@@ -181,7 +181,7 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
                     getBytes(&ch, 1);
                     numOfFollowingsArray[1] = ch;
                     short numOfFollowing = bytesToShort(numOfFollowingsArray);
-                    frame.append(std::to_string(10) + " " +
+                    frame.append("ACK " +
                     std::to_string(8) + " " +
                     std::to_string(numOfPosts) + " " +
                     std::to_string(numOfFollowers) + " " +
