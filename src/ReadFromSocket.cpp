@@ -15,10 +15,13 @@ public:
     }
 
     void run() {
-        while (!_connectionHandler->isShouldTerminate()){
+        while (1){
             string answer="";
             if(_connectionHandler->getLine(answer)) {
                 printf("%s\n",answer.c_str()); // get the line from the socket after decode and print
+                if (answer == "ACK 3") {
+                    break;
+                }
             }
         }
     }

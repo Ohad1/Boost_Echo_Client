@@ -17,7 +17,7 @@ using std::string;
 using std::to_string;
  
 ConnectionHandler::ConnectionHandler(string host, short port): host_(host), port_(port), io_service_(),
-socket_(io_service_), shouldTerminate(false){}
+socket_(io_service_), terminate(0){}
     
 ConnectionHandler::~ConnectionHandler() {
     close();
@@ -130,16 +130,19 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
             messageOpcode = bytesToShort(messageOpcodeArray);
             if (serverToClientOpcode==11) {
                 frame.append("ERROR " + std::to_string(messageOpcode));
+                if (messageOpcode == 3) {
+                    terminate = -1;
+                }
                 return true;
             }
             else if (serverToClientOpcode==10) {
-                if (messageOpcode==3) {
+                if (messageOpcode == 3) {
                     frame.append("ACK " + std::to_string(messageOpcode));
-                    shouldTerminate = true;
+                    terminate = 1;
                     close();
                     return true;
                 }
-                else if (messageOpcode==4 | messageOpcode==7) {
+                else if (messageOpcode == 4 | messageOpcode == 7) {
                     char numOfUsersArray[2];
                     getBytes(&ch, 1);
                     numOfUsersArray[0] = ch;
@@ -239,12 +242,12 @@ void ConnectionHandler::close() {
     }
 }
 
-bool ConnectionHandler::isShouldTerminate() const {
-    return shouldTerminate;
+int ConnectionHandler::getTerminate() const {
+    return terminate;
 }
 
-void ConnectionHandler::setShouldTerminate(bool shouldTerminate) {
-    ConnectionHandler::shouldTerminate = shouldTerminate;
+void ConnectionHandler::setTerminate(int terminate) {
+    ConnectionHandler::terminate = terminate;
 }
 
 short ConnectionHandler::bytesToShort(char* bytesArr)
