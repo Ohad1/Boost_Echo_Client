@@ -99,7 +99,7 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
         if (serverToClientOpcode==9) {
             frame.append("NOTIFICATION ");
             getBytes(&ch, 1);
-            if (ch=='0') {
+            if (ch=='\0') {
                 frame.append("PM ");
             }
             else {
