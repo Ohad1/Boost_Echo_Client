@@ -58,7 +58,6 @@ bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
     return true;
 }
 
-// good
 bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
     int tmp = 0;
 	boost::system::error_code error;
@@ -75,11 +74,10 @@ bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
     return true;
 }
 
-// good
 bool ConnectionHandler::getLine(std::string& line) {
     return getFrameAscii(line, '\n');
 }
-// good
+
 bool ConnectionHandler::sendLine(std::string& line) {
     return sendFrameAscii(line, '\n');
 }
@@ -150,7 +148,6 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
                     numOfUsersArray[1] = ch;
                     short numOfUsers = bytesToShort(numOfUsersArray);
                     frame.append("ACK " + std::to_string(messageOpcode) + " " + std::to_string(numOfUsers) + " ");
-                    //string username;
                     for (int i = 0; i < numOfUsers; i++) {
                         while (1) {
                             getBytes(&ch, 1);
@@ -203,20 +200,6 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
         std::cerr << "recv failed (Error: " << e.what() << ')' << std::endl;
         return false;
     }
-
-
-    // Stop when we encounter the null character.
-    // Notice that the null character is not appended to the frame string.
-//    try {
-//		do{
-//			getBytes(&ch, 1);
-//            frame.append(1, ch);
-//        }while (delimiter != ch);
-//    } catch (std::exception& e) {
-//        std::cerr << "recv failed (Error: " << e.what() << ')' << std::endl;
-//        return false;
-//    }
-//    return true;
 }
  
 bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
@@ -227,9 +210,6 @@ bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter)
         output[k] = line_after_encode[k];
     }
     short result;
-//    bool result=sendBytes(output,size);
-//	if(!result) return false;
-//	return sendBytes(&delimiter,1);
     return sendBytes(output,size);
 }
  
